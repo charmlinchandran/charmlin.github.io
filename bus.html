@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bus Timings Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .list-group-item {
+            background-color: #f9f9f9;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .upcoming {
+            background-color: lightgreen;
+            font-weight: bold;
+        }
+        .upcoming-second {
+            background-color: yellow;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Bus Timings Search</h1>
+        <div class="form-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search by Time, Route, Name, or Vehicle Number">
+        </div>
+        <div id="bus-list" class="list-group">
+            <!-- Bus timings will be added here using AJAX -->
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            const busTimings = [
+                { time: '06:15 AM', route: 'Route C', busName: 'Bus 404', vehicleNumber: 'GH4567' },
+                { time: '07:30 AM', route: 'Route A', busName: 'Bus 101', vehicleNumber: 'AB1234' },
+                { time: '09:30 AM', route: 'Route B', busName: 'Bus 202', vehicleNumber: 'CD5678' },
+                { time: '11:15 AM', route: 'Route C', busName: 'Bus 303', vehicleNumber: 'EF9012' },
+                { time: '12:45 PM', route: 'Route A', busName: 'Bus 101', vehicleNumber: 'AB1234' },
+                { time: '02:30 PM', route: 'Route A', busName: 'Bus 101', vehicleNumber: 'AB1234' },
+                { time: '03:45 PM', route: 'Route B', busName: 'Bus 202', vehicleNumber: 'CD5678' },
+                { time: '05:00 PM', route: 'Route B', busName: 'Bus 202', vehicleNumber: 'CD5678' },
+                { time: '07:00 PM', route: 'Route C', busName: 'Bus 404', vehicleNumber: 'GH4567' },
+                { time: '08:30 PM', route: 'Route A', busName: 'Bus 101', vehicleNumber: 'AB1234' },
+                { time: '09:15 PM', route: 'Route B', busName: 'Bus 202', vehicleNumber: 'CD5678' },
+                { time: '10:45 PM', route: 'Route C', busName: 'Bus 303', vehicleNumber: 'EF9012' },
+            ];
+
+            function displayBusTimings(timings) {
+                const busList = $('#bus-list');
+                busList.empty();
+
+                timings.forEach(function(timing) {
+                    const li = $('<li></li>').addClass('list-group-item d-flex justify-content-between align-items-center');
+                    li.html(`
+                        <span class="time">${timing.time}</span>
+                        <span class="route">${timing.route}</span>
+                        <span class="bus-name">${timing.busName}</span>
+                        <span class="vehicle-number">${timing.vehicleNumber}</span>
+                    `);
+                    busList.append(li);
+                });
+            }
+
+            function displaySearchResults(results) {
+                const searchInput = $('#searchInput');
+                const searchKeyword = searchInput.val().toLowerCase();
+
+                const filteredResults = results.filter(function(timing) {
+                    return (
+                        timing.time.toLowerCase().includes(searchKeyword) ||
+                        timing.route.toLowerCase().includes(searchKeyword) ||
+                        timing.busName.toLowerCase().includes(searchKeyword) ||
+                        timing.vehicleNumber.toLowerCase().includes(searchKeyword)
+                    );
+                });
+
+                displayBusTimings(filteredResults);
+            }
+
+            
+function highlightUpcomingBus(timings) {
+    const currentTime = new Date();
+    const currentTotalMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+    let nearestDiff = Infinity;
+    let nearestIndex = -1;
+    let secondNearestDiff = Infinity;
+    let secondNearestIndex = -1;
+
+    timings.forEach(function(timing, index) {
+        const [hours, minutes, meridiem] = timing.time.split(/:| /);
+        const convertedHours = meridiem === 'PM' && hours !== '12' ? parseInt(hours) + 12 : parseInt(hours);
+
+        const liTime = new Date();
+        liTime.setHours(convertedHours);
+        liTime.setMinutes(parseInt(minutes));
+        const liTotalMinutes = liTime.getHours() * 60 + liTime.getMinutes();
+
+        const timeDiff = liTotalMinutes - currentTotalMinutes;
+        if (timeDiff >= 0 && timeDiff < nearestDiff) {
+            secondNearestDiff = nearestDiff;
+            secondNearestIndex = nearestIndex;
+            nearestDiff = timeDiff;
+            nearestIndex = index;
+        } else if (timeDiff >= 0 && timeDiff < secondNearestDiff) {
+            secondNearestDiff = timeDiff;
+            secondNearestIndex = index;
+        }
+    });
+
+    if (nearestIndex !== -1) {
+        $('#bus-list').find('li').removeClass('upcoming upcoming-second');
+        $('#bus-list').find('li:eq(' + nearestIndex + ')').addClass('upcoming');
+        $('#bus-list').find('li:eq(' + secondNearestIndex + ')').addClass('upcoming-second');
+    }
+}
+
+
+            displayBusTimings(busTimings);
+            highlightUpcomingBus(busTimings);
+
+            $('#searchInput').on('input', function() {
+                displaySearchResults(busTimings);
+            });
+        });
+    </script>
+</body>
+</html>
