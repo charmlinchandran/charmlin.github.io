@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Counter</title>
+    <!-- Include Tailwind CSS (adjust the path accordingly) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <!-- Add meta viewport tag for mobile responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container mx-auto mt-5">
+        <div class="bg-gray-100 p-8 rounded-lg shadow-lg">
+            <h1 class="text-4xl font-bold mb-6">Token Counter</h1>
+            <div class="mb-4 flex items-center">
+                <label for="token-input" class="block text-sm font-medium text-gray-600">Edit Token Number:</label>
+                <input type="number" id="token-input" class="form-input ml-2 p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent" value="1" min="1">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full ml-2" onclick="saveToken()">Save</button>
+            </div>
+            <p class="text-lg font-semibold mb-4">Current Token: <span id="counter">1</span></p>
+            <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full mr-2" onclick="nextToken()">Next Token</button>
+            <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full" onclick="playToken()">Play Current Token</button>
+            <p id="announcement" class="mt-4"></p>
+        </div>
+    </div>
+
+    <script>
+        let currentToken = 1;
+
+        // Check if token exists in local storage and initialize it
+        if (localStorage.getItem('currentToken')) {
+            currentToken = parseInt(localStorage.getItem('currentToken'));
+        }
+
+        // Update the UI with the current token
+        updateToken();
+
+        function nextToken() {
+            currentToken++;
+            document.getElementById("token-input").value = currentToken;
+            updateToken();
+            playToken();
+        }
+
+        function saveToken() {
+            const newToken = parseInt(document.getElementById("token-input").value);
+            if (!isNaN(newToken)) {
+                currentToken = newToken;
+                updateToken();
+                // Save the current token in local storage
+                localStorage.setItem('currentToken', currentToken.toString());
+            }
+        }
+
+        function updateToken() {
+            document.getElementById("token-input").value = currentToken;
+            document.getElementById("counter").textContent = currentToken;
+        }
+
+        function playToken() {
+            speakToken(currentToken);
+        }
+
+        function speakToken(token) {
+            const speechText = `Token number ${token}`;
+            const speech = new SpeechSynthesisUtterance(speechText);
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+</body>
+</html>
