@@ -17,9 +17,19 @@
                 <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full ml-2" onclick="saveToken()">Save</button>
             </div>
             <p class="text-lg font-semibold mb-4">Current Token: <span id="counter">1</span></p>
-            <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full mr-2" onclick="nextToken()">Next Token</button>
-            <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full" onclick="playToken()">Play Current Token</button>
+            <button class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-full mr-2" onclick="nextToken()">Next Token</button>
+            <button class="bg-blue-500 hover-bg-blue-600 text-white py-3 px-6 rounded-full" onclick="playToken()">Play Current Token</button>
             <p id="announcement" class="mt-4"></p>
+        </div>
+    </div>
+
+    <!-- New container for text announcement -->
+    <div class="container mx-auto mt-5">
+        <div class="bg-gray-100 p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Text Announcement</h2>
+            <input type="text" id="text-to-announce" class="form-input p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent w-full" placeholder="Enter text to announce">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full mt-2" onclick="announceText()">Announce</button>
+            <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-full mt-2 ml-2" onclick="resetText()">Reset</button>
         </div>
     </div>
 
@@ -63,6 +73,20 @@
         function speakToken(token) {
             const speechText = `Token number ${token}`;
             const speech = new SpeechSynthesisUtterance(speechText);
+            window.speechSynthesis.speak(speech);
+        }
+
+        function announceText() {
+            const textToAnnounce = document.getElementById("text-to-announce").value;
+            speakText(textToAnnounce);
+        }
+
+        function resetText() {
+            document.getElementById("text-to-announce").value = "";
+        }
+
+        function speakText(text) {
+            const speech = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.speak(speech);
         }
     </script>
